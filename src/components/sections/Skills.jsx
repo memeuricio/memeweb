@@ -1,47 +1,48 @@
-import { cv } from '../../data/cv.js'
-import { SectionHeader } from './About.jsx'
+import { useApp } from "../../appContext.js";
+import Reveal from "../ui/Reveal.jsx";
+import SectionHeader from "../ui/SectionHeader.jsx";
 
 export default function Skills() {
-  const groups = Object.entries(cv.skills)
+  const { t } = useApp();
+  const { skills } = t;
+
   return (
-    <section id="skills" className="relative py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section
+      id="skills"
+      className="relative z-10 border-t border-line py-20 sm:py-28"
+    >
+      <div className="container-page">
         <SectionHeader
-          tag="04"
-          title="Stack & Skills"
-          subtitle="Las herramientas que uso día a día, con honestidad"
+          number="05"
+          kicker={skills.kicker}
+          title={skills.title}
+          lead={skills.lead}
         />
 
-        <div className="mt-12 grid gap-5 sm:mt-14 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {groups.map(([category, items], gi) => (
-            <div
-              key={category}
-              className="rounded-2xl border border-slate-800/60 bg-bg-800/40 p-5 backdrop-blur sm:p-6"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-mono text-sm text-accent-300">{category}</h3>
-                <span className="font-mono text-[11px] text-slate-500">0{gi + 1}</span>
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {skills.groups.map((group, index) => (
+            <Reveal key={group.title} delay={(index % 3) * 70}>
+              <div className="card flex h-full flex-col p-6">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
+                    {group.title}
+                  </h3>
+                  <span className="font-mono text-[10px] text-faint">
+                    0{index + 1}
+                  </span>
+                </div>
+                <ul className="mt-5 flex flex-wrap gap-1.5">
+                  {group.items.map((item) => (
+                    <li key={item} className="chip">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="mt-5 space-y-4 sm:mt-6">
-                {items.map((skill) => (
-                  <li key={skill.name}>
-                    <div className="flex items-center justify-between font-mono text-xs">
-                      <span className="text-slate-200">{skill.name}</span>
-                      <span className="text-slate-500">{skill.level}%</span>
-                    </div>
-                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800/80">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-accent-400 to-accent-glow shadow-[0_0_12px_rgba(34,211,238,0.5)]"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

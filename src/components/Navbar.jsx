@@ -1,124 +1,204 @@
-import { useEffect, useState } from 'react'
-import { cv, navLinks } from '../data/cv.js'
-import { PlaygroundToggle } from './Playground.jsx'
-import { usePlayground } from './playgroundContext.js'
+import { useEffect, useState } from "react";
+import { useApp } from "../appContext.js";
+import { profile, sectionOrder } from "../data/cv.js";
+import { CloseIcon, MenuIcon, MoonIcon, SunIcon } from "./ui/Icons.jsx";
+
+function ThemeToggle({ className = "" }) {
+  const { theme, toggleTheme, t } = useApp();
+  const next = theme === "dark" ? t.ui.themeLight : t.ui.themeDark;
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className={`icon-btn ${className}`}
+      aria-label={`${t.ui.theme}: ${next}`}
+      title={`${t.ui.theme}: ${next}`}
+    >
+      {theme === "dark" ? <SunIcon size={15} /> : <MoonIcon size={15} />}
+    </button>
+  );
+}
+
+function LangSwitch({ className = "" }) {
+  const { lang, setLang, t } = useApp();
+
+  return (
+    <div
+      role="group"
+      aria-label={t.ui.language}
+      className={`inline-flex items-center rounded-lg border border-line bg-surface p-0.5 ${className}`}
+    >
+      {["es", "en"].map((code) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => setLang(code)}
+          aria-pressed={lang === code}
+          className={`rounded-md px-2 py-1 font-mono text-[11px] uppercase transition-colors ${
+            lang === code
+              ? "bg-accent-soft text-accent"
+              : "text-muted hover:text-ink"
+          }`}
+        >
+          {code}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function useScrollSpy(ids) {
+  const [activeId, setActiveId] = useState("");
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActiveId(visible[0].target.id);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5] },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [ids]);
+
+  return activeId;
+}
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
-  const { active } = usePlayground()
+  const { t } = useApp();
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const activeId = useScrollSpy(sectionOrder);
+  const shortRole = t.hero.role.split("·")[0].trim();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [open])
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const close = () => setOpen(false);
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-out ${
-        active
-          ? 'pointer-events-none -translate-y-3 opacity-0'
-          : 'translate-y-0 opacity-100'
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        scrolled || open
+          ? "border-b border-line bg-paper/85 backdrop-blur-md"
+          : "border-b border-transparent"
       }`}
     >
-      <div
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border px-3 py-2 transition-all duration-300 sm:px-5 sm:py-2.5 ${
-          scrolled
-            ? 'glass border-accent-500/20 shadow-[0_8px_32px_-12px_rgba(34,211,238,0.25)]'
-            : 'border-transparent'
-        }`}
-        style={{ marginTop: scrolled ? '12px' : '20px', width: 'min(72rem, calc(100% - 1rem))' }}
-      >
-        <a href="#hero" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-accent-500/40 transition-all group-hover:border-accent-400 group-hover:shadow-[0_0_20px_-2px_rgba(34,211,238,0.6)]">
-            <img src="/icon.jpg" alt={cv.name} className="h-full w-full object-cover" />
-            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-accent-glow shadow-[0_0_8px_#4ade80]" />
-          </span>
-          <span className="hidden font-mono text-sm text-slate-300 sm:block">
-            <span className="text-accent-400">~/</span>
-            memeuricio
+      <div className="container-page flex h-16 items-center justify-between gap-4">
+        <a
+          href="#hero"
+          onClick={close}
+          className="flex items-center gap-3"
+          aria-label={profile.name}
+        >
+          <span className="hidden sm:block">
+            <span className="block font-serif text-[15px] leading-tight text-ink">
+              {profile.name}
+            </span>
+            <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+              {shortRole}
+            </span>
           </span>
         </a>
 
-        <ul className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="group relative rounded-full px-3.5 py-2 font-mono text-xs text-slate-300 transition-colors hover:text-accent-300"
-              >
-                {link.label}
-                <span className="absolute inset-x-3.5 -bottom-0.5 h-px scale-x-0 bg-gradient-to-r from-accent-400 to-accent-glow transition-transform duration-300 group-hover:scale-x-100" />
-              </a>
-            </li>
-          ))}
-        </ul>
+        <nav aria-label="Principal" className="hidden lg:block">
+          <ul className="flex items-center gap-1">
+            {t.nav.map((link) => {
+              const isActive = activeId === link.id;
+              return (
+                <li key={link.id}>
+                  <a
+                    href={`#${link.id}`}
+                    aria-current={isActive ? "true" : undefined}
+                    className={`relative rounded-md px-3 py-2 text-sm transition-colors ${
+                      isActive ? "text-ink" : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {link.label}
+                    <span
+                      className={`absolute inset-x-3 -bottom-px h-px bg-accent transition-transform duration-300 ${
+                        isActive ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
         <div className="flex items-center gap-2">
-          <PlaygroundToggle />
-          <a
-            href="#contact"
-            className="hidden rounded-full border border-accent-500/40 bg-accent-500/10 px-4 py-2 font-mono text-xs text-accent-300 transition-all hover:border-accent-400 hover:bg-accent-500/20 hover:shadow-[0_0_24px_-6px_rgba(34,211,238,0.6)] sm:inline-flex"
-          >
-            Hablemos →
-          </a>
+          <LangSwitch className="hidden sm:inline-flex" />
+          <ThemeToggle />
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-accent-500/30 bg-bg-800/60 text-accent-300 md:hidden"
-            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="icon-btn lg:hidden"
+            aria-label={open ? t.ui.close : t.ui.menu}
             aria-expanded={open}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {open ? (
-                <path d="M6 6l12 12M6 18L18 6" />
-              ) : (
-                <>
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </>
-              )}
-            </svg>
+            {open ? <CloseIcon size={16} /> : <MenuIcon size={16} />}
           </button>
         </div>
       </div>
 
       {open && (
-        <div className="mx-4 mt-2 overflow-hidden rounded-2xl border border-accent-500/20 bg-bg-800/95 shadow-2xl backdrop-blur md:hidden">
-          <ul className="flex flex-col p-2">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  onClick={() => setOpen(false)}
-                  href={link.href}
-                  className="flex items-center justify-between rounded-xl px-4 py-3 font-mono text-sm text-slate-300 transition-colors hover:bg-accent-500/10 hover:text-accent-300"
-                >
-                  <span>{link.label}</span>
-                  <span className="text-accent-400">→</span>
-                </a>
-              </li>
-            ))}
-            <li className="px-1 pb-1 pt-2">
-              <a
-                onClick={() => setOpen(false)}
-                href="#contact"
-                className="flex items-center justify-center gap-2 rounded-xl border border-accent-500/40 bg-accent-500/10 px-4 py-3 font-mono text-sm text-accent-300"
-              >
-                Hablemos →
-              </a>
-            </li>
-          </ul>
+        <div className="border-t border-line bg-paper lg:hidden">
+          <nav aria-label="Móvil" className="container-page py-4">
+            <ul className="divide-y divide-line">
+              {t.nav.map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={`#${link.id}`}
+                    onClick={close}
+                    className="flex items-center justify-between py-3.5 font-serif text-lg text-ink"
+                  >
+                    {link.label}
+                    <span className="font-mono text-xs text-faint">
+                      0{sectionOrder.indexOf(link.id) + 1}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center justify-between pt-5">
+              <LangSwitch />
+              <ThemeToggle />
+            </div>
+          </nav>
         </div>
       )}
     </header>
-  )
+  );
 }

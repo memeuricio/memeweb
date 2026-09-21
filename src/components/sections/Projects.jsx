@@ -1,65 +1,53 @@
-import { cv } from '../../data/cv.js'
-import { SectionHeader } from './About.jsx'
+import { useApp } from "../../appContext.js";
+import Reveal from "../ui/Reveal.jsx";
+import SectionHeader from "../ui/SectionHeader.jsx";
 
 export default function Projects() {
+  const { t } = useApp();
+  const { projects } = t;
+
   return (
-    <section id="projects" className="relative py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section
+      id="projects"
+      className="relative z-10 border-t border-line py-20 sm:py-28"
+    >
+      <div className="container-page">
         <SectionHeader
-          tag="03"
-          title="Proyectos"
-          subtitle="Una selección de cosas que he construido recientemente"
+          number="03"
+          kicker={projects.kicker}
+          title={projects.title}
+          lead={projects.lead}
         />
 
-        <div className="mt-12 grid gap-5 sm:mt-14 sm:gap-6 md:grid-cols-2">
-          {cv.projects.map((p, idx) => (
-            <article
-              key={p.title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-800/60 bg-bg-800/40 p-5 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-accent-500/40 hover:shadow-[0_20px_50px_-20px_rgba(34,211,238,0.4)] sm:p-6"
-            >
-              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-accent-500/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-              <div className="flex items-start justify-between gap-3">
-                <div className="font-mono text-[11px] text-accent-400">
-                  project_{String(idx + 1).padStart(2, '0')}
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
+          {t.projectItems.map((project, index) => (
+            <Reveal key={project.id} delay={(index % 2) * 80}>
+              <article className="card flex h-full flex-col p-6 transition-colors duration-300 hover:border-line-strong">
+                <div className="flex items-baseline justify-between gap-4 font-mono text-[11px] text-faint">
+                  <span>{project.company}</span>
+                  <span>{project.period}</span>
                 </div>
-                <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent-glow/80" />
-                  <span className="hidden sm:inline">{p.highlight}</span>
-                  <span className="sm:hidden">destacado</span>
+
+                <h3 className="mt-4 font-serif text-xl leading-snug text-ink">
+                  {project.title}
+                </h3>
+
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  {project.description}
+                </p>
+
+                <div className="mt-auto flex flex-wrap gap-1.5 pt-6">
+                  {project.stack.map((tech) => (
+                    <span key={tech} className="chip">
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-              </div>
-
-              <h3 className="mt-4 text-xl font-semibold text-slate-100 transition-colors group-hover:text-accent-300 sm:text-2xl">
-                {p.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-400">
-                {p.description}
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {p.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-md border border-slate-700/60 bg-slate-900/40 px-2 py-0.5 font-mono text-[11px] text-slate-300"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-5 flex items-center gap-4 border-t border-slate-800/60 pt-4 font-mono text-xs sm:mt-6">
-                <a href={p.link} className="text-accent-300 transition-colors hover:text-accent-400">
-                  live ↗
-                </a>
-                <a href={p.repo} className="text-slate-400 transition-colors hover:text-slate-200">
-                  code ↗
-                </a>
-              </div>
-            </article>
+              </article>
+            </Reveal>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

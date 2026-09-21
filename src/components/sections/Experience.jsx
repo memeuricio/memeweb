@@ -1,60 +1,71 @@
-import { cv } from '../../data/cv.js'
-import { SectionHeader } from './About.jsx'
+import { useApp } from "../../appContext.js";
+import Reveal from "../ui/Reveal.jsx";
+import SectionHeader from "../ui/SectionHeader.jsx";
 
 export default function Experience() {
+  const { t } = useApp();
+  const { experience } = t;
+
   return (
-    <section id="experience" className="relative py-20 sm:py-28">
-      <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-accent-500/30 to-transparent" />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section
+      id="experience"
+      className="relative z-10 border-t border-line py-20 sm:py-28"
+    >
+      <div className="container-page">
         <SectionHeader
-          tag="02"
-          title="Experiencia"
-          subtitle="Una línea de tiempo de los lugares donde he construido cosas"
+          number="02"
+          kicker={experience.kicker}
+          title={experience.title}
+          lead={experience.lead}
         />
 
-        <div className="relative mt-12 sm:mt-16">
-          <div className="absolute left-4 top-0 bottom-0 hidden w-px bg-gradient-to-b from-accent-500/60 via-accent-500/20 to-transparent md:left-1/2 md:block" />
+        <div className="mt-14">
+          {t.experienceItems.map((item) => (
+            <Reveal
+              key={item.id}
+              className="border-t border-line py-10 first:border-t-0 first:pt-0 sm:grid sm:grid-cols-[11rem_1fr] sm:gap-10"
+            >
+              <div className="sm:pt-1">
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+                  {item.period}
+                </p>
+                <p className="mt-2 font-serif text-lg leading-snug text-ink">
+                  {item.company}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-faint">
+                  {item.location}
+                </p>
+              </div>
 
-          <ul className="flex flex-col gap-8 sm:gap-10">
-            {cv.experience.map((item, idx) => (
-              <li key={item.company} className="relative md:grid md:grid-cols-2 md:gap-12">
-                <span className="absolute left-4 top-6 hidden h-3 w-3 -translate-x-1/2 rounded-full border-2 border-accent-400 bg-bg-900 shadow-[0_0_12px_rgba(34,211,238,0.7)] md:left-1/2 md:block" />
+              <div>
+                <h3 className="font-serif text-xl leading-snug text-ink sm:text-2xl">
+                  {item.role}
+                </h3>
 
-                <div className={`pl-12 md:pl-0 ${idx % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:order-2 md:pl-12'}`}>
-                  <div className="font-mono text-xs text-accent-400">{item.period}</div>
-                  <h3 className="mt-1 text-lg font-semibold text-slate-100 sm:text-xl">{item.role}</h3>
-                  <div className="text-sm text-slate-400">
-                    {item.company} · <span className="text-slate-500">{item.location}</span>
-                  </div>
+                <ul className="mt-5 space-y-2.5">
+                  {item.bullets.map((bullet) => (
+                    <li
+                      key={bullet}
+                      className="flex gap-3 text-sm leading-relaxed text-muted"
+                    >
+                      <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-line-strong" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-6 flex flex-wrap gap-1.5">
+                  {item.stack.map((tech) => (
+                    <span key={tech} className="chip">
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-
-                <div className={`mt-3 pl-12 md:mt-0 md:pl-0 ${idx % 2 === 0 ? 'md:pl-12' : 'md:order-1 md:pr-12 md:text-right'}`}>
-                  <div className="rounded-2xl border border-slate-800/60 bg-bg-800/40 p-4 text-left backdrop-blur transition-colors hover:border-accent-500/30 sm:p-5">
-                    <ul className="space-y-2 text-sm text-slate-300">
-                      {item.bullets.map((b) => (
-                        <li key={b} className="flex gap-2 md:gap-3">
-                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent-400" />
-                          <span className="text-slate-200">{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className={`mt-4 flex flex-wrap gap-1.5`}>
-                      {item.stack.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full border border-accent-500/30 bg-accent-500/5 px-2.5 py-0.5 font-mono text-[11px] text-accent-300"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

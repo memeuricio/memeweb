@@ -1,24 +1,30 @@
-import { cv } from '../data/cv.js'
+import { useApp } from "../appContext.js";
+import { profile } from "../data/cv.js";
+import { ArrowUpIcon } from "./ui/Icons.jsx";
 
 export default function Footer() {
-  const year = new Date().getFullYear()
+  const { t } = useApp();
+  const year = new Date().getFullYear();
+
   return (
-    <footer
-      className="relative border-t border-slate-800/60 py-8 sm:py-10"
-      style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
-    >
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 text-center sm:flex-row sm:gap-4 sm:px-6 sm:text-left">
-        <div className="font-mono text-[11px] text-slate-500 sm:text-xs">
-          <span className="text-accent-400">©</span> {year} {cv.name} · Hecho con
-          <span className="text-accent-300"> React</span>,
-          <span className="text-accent-300"> Vite</span>,
-          <span className="text-accent-300"> Tailwind</span> &amp;
-          <span className="text-accent-300"> R3F</span>
+    <footer className="relative z-10 border-t border-line">
+      <div className="container-page flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
+        <div className="text-center sm:text-left">
+          <p className="font-mono text-[11px] text-muted">
+            © {year} {profile.name}
+          </p>
+          <p className="mt-1 text-xs text-faint">
+            {t.footer.built} · {t.footer.stack}
+          </p>
         </div>
-        <div className="font-mono text-[11px] text-slate-600">
-          <span className="text-accent-glow">●</span> v0.1.0
-        </div>
+        <a
+          href="#hero"
+          className="inline-flex items-center gap-2 font-mono text-[11px] text-muted transition-colors hover:text-accent"
+        >
+          <ArrowUpIcon size={13} />
+          {t.footer.top}
+        </a>
       </div>
     </footer>
-  )
+  );
 }

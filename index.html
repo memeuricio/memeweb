@@ -1,10 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/web.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fixed_cv</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Mauricio Flores Barros — Ingeniero en Informática especializado en Data Engineering, Cloud y desarrollo Full-Stack."
+    />
+    <title>Mauricio Flores Barros · Ingeniero en Informática</title>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem("mf-theme");
+          if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          }
+          if (theme === "dark") document.documentElement.classList.add("dark");
+          var lang = localStorage.getItem("mf-lang");
+          if (!lang) {
+            lang = (navigator.language || "en").toLowerCase().indexOf("es") === 0
+              ? "es"
+              : "en";
+          }
+          document.documentElement.lang = lang;
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>
